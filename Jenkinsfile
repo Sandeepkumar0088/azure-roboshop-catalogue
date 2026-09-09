@@ -1,27 +1,51 @@
 pipeline {
-
     agent any
 
     stages {
-        stage('CheckOut') {
+
+        stage('Checkout App Code') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/sdevops5427/roboshop-catalogue-v1.git'
+                dir('catalogue') {
+                    git branch: 'main',
+                        url: 'https://github.com/Sandeepkumar0088/azure-roboshop-catalogue.git'
+                }
             }
         }
+
         stage('Build Image') {
             steps {
-                sh "docker build -t catalogue ."
+                dir('catalogue') {
+                    sh 'docker build -t catalogue .'
+                }
             }
         }
+
         stage('Tag Image') {
             steps {
-                sh "docker tag catalogue roboshop0088.azurecr.io/catalogue:latest"
+                sh 'docker tag catalogue roboshop0088.azurecr.io/catalogue:latest'
             }
         }
+
         stage('Push Image') {
             steps {
-                sh "docker push roboshop0088.azurecr.io/catalogue"
+                sh 'docker push roboshop0088.azurecr.io/catalogue:latest'
+            }
+        }
+
+        stage('Checkout Helm Chart') {
+            steps {
+                dir('helm') {
+                    git branch: 'main',
+                        url: 'https://github.com/sdevops5427/azure-roboshop-catalogue.git'
+                }
+            }
+        }
+
+        stage('Deploy on AKS') {
+            steps {
+                dir('helm') {
+                    sh 'helm upgrade -i catalogue . -f templates/catalogue.yml --install --take-ownership'
+                }
             }
         }
     }
