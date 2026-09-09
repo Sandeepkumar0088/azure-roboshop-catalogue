@@ -3,16 +3,11 @@ pipeline {
     agent any
 
     stages {
-        stage('CheckOut') {
-            steps {
-                git branch: 'main',
-                    url: 'https://github.com/sdevops5427/roboshop-catalogue-v1.git'
-            }
-        }
         stage('Build Image') {
             steps {
-                sh "cd db"
-                sh "docker build -t catalogue-db-image ."
+                dir('db') {
+                    sh "docker build -t catalogue-db-image ."
+                }
             }
         }
         stage('Tag Image') {
