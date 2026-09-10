@@ -40,6 +40,11 @@ pipeline {
                 }
             }
         }
+        stage('Get AKS Credentials') {
+            steps {
+                sh 'az aks get-credentials --resource-group cluster --name dev --overwrite-existing'
+            }
+        }
 
         stage('Deploy on AKS') {
             steps {
